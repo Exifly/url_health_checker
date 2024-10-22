@@ -12,8 +12,12 @@ class StatusChecker:
         self._url_to_check = url_to_check
 
     def _is_online(self) -> tuple[bool, int]:
-        response = requests.get(self._url_to_check)
-        return response.status_code == 200, response.status_code
+        try:
+            response = requests.get(self._url_to_check)
+            return response.status_code == 200, response.status_code
+        except Exception as error:
+            print(f"Error: {error}")
+            return False, 0
 
     def run(self) -> None:
         is_online, status_code = self._is_online()
@@ -26,19 +30,10 @@ class StatusChecker:
             description=f"the ping returned a status code of {status_code}",
             color=16711680,
             fields=[
-                {
-                    "name": "Endpoint tested",
-                    "value": str(self._url_to_check)
-                },
-                {
-                    "name": "Status code",
-                    "value": str(status_code)
-                },
-                {
-                    "name": "Date",
-                    "value": str(datetime.now())
-                },
-            ]
+                {"name": "Endpoint tested", "value": str(self._url_to_check)},
+                {"name": "Status code", "value": str(status_code)},
+                {"name": "Date", "value": str(datetime.now())},
+            ],
         )
 
         discord_manager.send_message()

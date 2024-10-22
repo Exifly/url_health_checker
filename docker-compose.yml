@@ -1,0 +1,43 @@
+version: '3'
+
+networks:
+  codeshot-checker-network:
+    driver: bridge
+
+services:
+  #---------------
+  #   Codeishot
+  #---------------
+  codeishot-checker:
+    container_name: codeshot_checker_server
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    image: codeishot/codeishot-checker:latest
+    env_file:
+      - ./envs/.api.codeishot.env
+    tty: true
+    stdin_open: true
+    networks:
+      codeshot-checker-network:
+        aliases:
+          - codeshot-checker-network
+
+    command: python3 start.py
+  
+  #------------------------
+  #   Codeishot Frontend
+  #------------------------
+  codeishot-frontend-checker:
+    container_name: codeshot_checker_client
+    image: codeishot/codeishot-checker:latest
+    env_file:
+      - ./envs/.codeishot.env
+    tty: true
+    stdin_open: true
+    networks:
+      codeshot-checker-network:
+        aliases:
+          - codeshot-checker-network
+
+    command: python3 start.py
